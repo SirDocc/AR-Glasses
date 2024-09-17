@@ -44,7 +44,7 @@ void drawArrowDown(void){ //Draws an arrow down
   int ox = 52; //offset X
   int oy = 20; //offset Y
   display.fillTriangle(10+ox, 20+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
-  display.fillRect(5+ox, 10+oy, 10, 10, WHITE);
+  display.fillRect(5+ox, 0+oy, 10, 10, WHITE);
 } 
 
 void drawArrowLeft(void){
@@ -65,12 +65,28 @@ void textDemo(void){
   display.setCursor(45,28);
   display.println("Hallo!");
   display.display();
-  delay(2000);
+  delay(1000);
   display.clearDisplay();
   display.setCursor(45,28);
   display.println("Banane");
   display.display();
-  delay(2000);
+  delay(1000);
+  display.clearDisplay();
+  drawArrowUp();
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  drawArrowDown();
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  drawArrowLeft();
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  drawArrowRight();
+  display.display();
+  delay(1000);
   display.clearDisplay();
 }
 
