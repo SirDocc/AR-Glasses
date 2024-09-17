@@ -24,7 +24,6 @@ void setup() {
 }
 
 void loop() {
-  textDemo();
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
@@ -73,4 +72,20 @@ void textDemo(void){
   display.display();
   delay(2000);
   display.clearDisplay();
+}
+
+void teleprompter(void){
+  display.clearDisplay();
+  int pos = 80;
+  while(pos > -50){
+    display.setCursor(0, pos);
+    display.println("BEEMOVIE SCRIPT HELP MEEE");
+    display.display();
+    delay(100);
+    pos = pos - 1;
+    display.clearDisplay();
+    display.setCursor(0, pos);
+    display.println("BEEMOVIE SCRIPT HELP MEEE");
+    display.display();
+  }
 }
