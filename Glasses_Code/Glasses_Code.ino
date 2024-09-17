@@ -15,20 +15,29 @@ void setup() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
+
   delay(2000);
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  
-  display.setCursor(50, 32);
-  display.println("12:49");
-  display.drawLine(0, 0, 127, 63, WHITE);
-  display.drawLine(127, 0, 0, 63, WHITE);
-  display.display();
+
+  drawcenterlines(); //draw centering lines to help with positioning
+
+  drawarrowup(); //makes an arrow up
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
   
+}
+
+void drawcenterlines(void){
+  display.drawLine(0, 0, 127, 63, WHITE);
+  display.drawLine(127, 0, 0, 63, WHITE);
+}
+
+void drawarrowup(void){
+  display.drawTriangle(6, 1, 1, 5, 10, 5, WHITE);
+  display.drawRect(5, 5, 5, 5, WHITE)
 }
