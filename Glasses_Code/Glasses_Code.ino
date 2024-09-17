@@ -39,5 +39,5 @@ void drawcenterlines(void){
 
 void drawarrowup(void){
   display.drawTriangle(10, 0, 0, 10, 20, 10, WHITE);
-  display.drawRect(10, 10, 5, 5, WHITE);
+  display.drawRect(5, 10, 10, 10, WHITE);
 }
