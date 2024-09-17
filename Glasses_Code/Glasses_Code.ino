@@ -19,20 +19,16 @@ void setup() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-
-  /*display.setCursor(0, 10);
-  display.println("Hello, world!");
-  display.display();*/
-
+  
+  display.setCursor(50, 32);
+  display.println("12:49");
+  display.drawLine(0, 0, 127, 63);
+  display.drawLine(127, 0, 0, 63);
+  display.display();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  display.setCursor(64, 32);
-  display.println("12:46");
-  display.display();
-  delay(1000);
-  display.clearDisplay();
-  display.display();
-  delay(1000);
+
+  
 }
