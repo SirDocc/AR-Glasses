@@ -31,12 +31,10 @@ void loop() {
   // put your main code here, to run repeatedly:
 }
 
-void blink();
-
 void blink(void){
   for(;;) {
     display.setCursor(35, 30);
-    display.println("10:08");
+    display.println("11:19");
     display.display();
     delay(1000);
     display.clearDisplay();
