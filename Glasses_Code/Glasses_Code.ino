@@ -28,8 +28,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  display.setCursor(30, 30);
-  display.println("12:38");
+  display.setCursor(64, 32);
+  display.println("12:46");
   display.display();
   delay(1000);
   display.clearDisplay();
