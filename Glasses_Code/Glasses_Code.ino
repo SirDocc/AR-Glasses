@@ -38,6 +38,6 @@ void drawcenterlines(void){
 }
 
 void drawarrowup(void){
-  display.drawTriangle(6, 1, 1, 5, 10, 5, WHITE);
+  display.drawTriangle(10, 0, 0, 5, 15, 5, WHITE);
   display.drawRect(5, 5, 5, 5, WHITE);
 }
