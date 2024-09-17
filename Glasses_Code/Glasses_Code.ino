@@ -21,15 +21,10 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  drawcenterlines();
-
-  drawarrowup();
-
-  display.display();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  textDemo();
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
@@ -65,4 +60,17 @@ void drawArrowRight(void){
   int oy = 20; //offset Y
   display.fillTriangle(20+ox, 10+oy, 10+ox, 0+oy, 10+ox, 20+oy, WHITE);
   display.fillRect(0+ox, 5+oy, 10, 10, WHITE);
+}
+
+void textDemo(void){
+  display.setCursor(45,28);
+  display.println("Hallo!");
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  display.setCursor(45,28);
+  display.println("Banane");
+  display.display();
+  delay(2000);
+  display.clearDisplay();
 }
