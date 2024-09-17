@@ -24,11 +24,21 @@ void setup() {
   display.println("Hello, world!");
   display.display();*/
 
- testfillrect();      // Draw rectangles (filled)
+ sayHello();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+}
+
+void sayHello(void) {
+  display.clearDisplay();
+  for(int i = 0; i < 10; i++){
+    display.setCursor(30, 30);
+    display.println("11:32");
+    display.drawLine(30, 35, 40, 35, WHITE);
+    delay(1000);
+  }
 }
 
 void testfillrect(void) {
