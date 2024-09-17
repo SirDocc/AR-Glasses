@@ -17,16 +17,20 @@ void setup() {
   }
   delay(2000);
   display.clearDisplay();
-
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0, 10);
 
+  /*display.setCursor(0, 10);
   display.println("Hello, world!");
-  display.display();
+  display.display();*/
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  display.clearDisplay();
+  delay(1000);
+  display.setCursor(0,10);
+  display.println("Hello!!!");
+  display.display();
+  delay(1000);
 }
