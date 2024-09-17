@@ -24,6 +24,7 @@ void setup() {
 }
 
 void loop() {
+  textDemo();
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
