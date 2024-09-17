@@ -23,7 +23,7 @@ void setup() {
 
   drawcenterlines();
 
-  drawarrowdown();
+  drawarrowup();
 
   display.display();
 }
