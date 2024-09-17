@@ -25,12 +25,11 @@ void setup() {
 
   drawarrowup(); //makes an arrow up
 
+  display.display();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  drawarrowup();
-  drawcenterlines();
 }
 
 void drawcenterlines(void){
