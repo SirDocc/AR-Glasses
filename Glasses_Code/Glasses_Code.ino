@@ -24,30 +24,15 @@ void setup() {
   display.println("Hello, world!");
   display.display();*/
 
- sayHello();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-}
-
-void sayHello(void) {
+  display.setCursor(30, 30);
+  display.println("12:38");
+  display.display();
+  delay(1000);
   display.clearDisplay();
-  for(int i = 0; i < 10; i++){
-    display.setCursor(30, 30);
-    display.println("11:32");
-    display.drawLine(30, 35, 40, 35, WHITE);
-    delay(1000);
-  }
-}
-/*
-void testfillrect(void) {
-  display.clearDisplay();
-
-  for(int16_t i=0; i<display.height()/2; i+=3) {
-    // The INVERSE color is used so rectangles alternate white/black
-    display.fillRect(i, i, display.width()-i*2, display.height()-i*2, SSD1306_INVERSE);
-    display.display(); // Update screen with each newly-drawn rectangle
-    delay(1);
-  }
+  display.display();
+  delay(1000);
 }
