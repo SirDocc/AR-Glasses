@@ -22,8 +22,8 @@ void setup() {
   
   display.setCursor(50, 32);
   display.println("12:49");
-  display.drawLine(0, 0, 127, 63);
-  display.drawLine(127, 0, 0, 63);
+  display.drawLine(0, 0, 127, 63, WHITE);
+  display.drawLine(127, 0, 0, 63, WHITE);
   display.display();
 }
 
