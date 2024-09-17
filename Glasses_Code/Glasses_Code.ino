@@ -23,16 +23,22 @@ void setup() {
   /*display.setCursor(0, 10);
   display.println("Hello, world!");
   display.display();*/
+
+  blink();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  while(true){
-    display.clearDisplay();
-    delay(3000);
-    display.setCursor(30,30);
-    display.println("9:54");
+    void blink();
+}
+
+void blink(void){
+  for(;;) {
+    display.setCursor(35, 30);
+    display.println("10:08");
     display.display();
-    delay(3000);
+    delay(1000);
+    display.clearDisplay();
+    delay(1000);
   }
 }
