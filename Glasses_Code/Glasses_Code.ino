@@ -29,10 +29,10 @@ void loop() {
   // put your main code here, to run repeatedly:
   while(true){
     display.clearDisplay();
-    delay(1000);
+    delay(3000);
     display.setCursor(30,30);
-    display.println("9:44");
+    display.println("9:54");
     display.display();
-    delay(1000);
+    delay(3000);
   }
 }
