@@ -21,9 +21,9 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  drawcenterlines(); //draw centering lines to help with positioning
+  drawcenterlines();
 
-  drawarrowup(); //makes an arrow up
+  drawarrowdown();
 
   display.display();
 }
@@ -32,16 +32,23 @@ void loop() {
   // put your main code here, to run repeatedly:
 }
 
-void drawcenterlines(void){
+void drawcenterlines(void){ //drawing a debug X for offset finding
   display.drawLine(0, 0, 127, 63, WHITE);
   display.drawLine(127, 0, 0, 63, WHITE);
 }
 
-void drawarrowup(void){
-  int ox = 55; //offset X
+void drawarrowup(void){ // Draws an arrow up
+  int ox = 53; //offset X
   int oy = 20; //offset Y
   display.fillTriangle(10+ox, 0+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
   display.fillRect(5+ox, 10+oy, 10, 10, WHITE);
   //Triangle Size: 10, 0, 0, 10, 20, 10
   //Rectangle Size: 5, 10, 10, 10
 }
+
+void drawarrowdown(void){ //Draws an arrow down
+  int ox = 53; //offset X
+  int oy = 20; //offset Y
+  display.fillTriangle(10, 20, 0, 10, 20, 10, WHITE);
+  display.fillRect(5, 0, 10, 10, WHITE);
+} 
