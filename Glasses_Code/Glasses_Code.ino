@@ -38,7 +38,7 @@ void drawcenterlines(void){
 }
 
 void drawarrowup(void){
-  int ox = 45; //offset X
+  int ox = 55; //offset X
   int oy = 20; //offset Y
   display.fillTriangle(10+ox, 0+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
   display.fillRect(5+ox, 10+oy, 10, 10, WHITE);
