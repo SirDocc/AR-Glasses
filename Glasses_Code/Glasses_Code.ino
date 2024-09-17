@@ -40,7 +40,7 @@ void sayHello(void) {
     delay(1000);
   }
 }
-
+/*
 void testfillrect(void) {
   display.clearDisplay();
 
