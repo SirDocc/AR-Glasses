@@ -37,7 +37,7 @@ void drawcenterlines(void){ //drawing a debug X for offset finding
   display.drawLine(127, 0, 0, 63, WHITE);
 }
 
-void drawarrowup(void){ // Draws an arrow up
+void drawArrowUp(void){ // Draws an arrow up
   int ox = 52; //offset X
   int oy = 20; //offset Y
   display.fillTriangle(10+ox, 0+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
@@ -46,9 +46,23 @@ void drawarrowup(void){ // Draws an arrow up
   //Rectangle Size: 5, 10, 10, 10
 }
 
-void drawarrowdown(void){ //Draws an arrow down
-  int ox = 53; //offset X
+void drawArrowDown(void){ //Draws an arrow down
+  int ox = 52; //offset X
   int oy = 20; //offset Y
-  display.fillTriangle(10, 20, 0, 10, 20, 10, WHITE);
-  display.fillRect(5, 0, 10, 10, WHITE);
+  display.fillTriangle(10+ox, 20+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
+  display.fillRect(5+ox, 10+oy, 10, 10, WHITE);
 } 
+
+void drawArrowLeft(void){
+  int ox = 52; //offset X
+  int oy = 20; //offset Y
+  display.fillTriangle(0+ox, 10+oy, 10+ox, 0+oy, 10+ox, 20+oy, WHITE);
+  display.fillRect(10+ox, 5+oy, 10, 10, WHITE);
+}
+
+void drawArrowRight(void){
+  int ox = 52; //offset X
+  int oy = 20; //offset Y
+  display.fillTriangle(20+ox, 10+oy, 10+ox, 0+oy, 10+ox, 20+oy, WHITE);
+  display.fillRect(0+ox, 5+oy, 10, 10, WHITE);
+}
