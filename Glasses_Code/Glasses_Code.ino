@@ -21,7 +21,7 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  drawcenterlines(); //draw centering lines to help with positioning
+  //drawcenterlines(); //draw centering lines to help with positioning
 
   drawarrowup(); //makes an arrow up
 
@@ -38,6 +38,8 @@ void drawcenterlines(void){
 }
 
 void drawarrowup(void){
-  display.drawTriangle(10, 0, 0, 10, 20, 10, WHITE);
-  display.drawRect(5, 10, 10, 10, WHITE);
+  display.fillTriangle(10, 0, 0, 10, 20, 10, WHITE);
+  display.fillRect(5, 10, 10, 10, WHITE);
+  //Triangle Size: 10, 0, 0, 10, 20, 10
+  //Rectangle Size: 5, 10, 10, 10
 }
