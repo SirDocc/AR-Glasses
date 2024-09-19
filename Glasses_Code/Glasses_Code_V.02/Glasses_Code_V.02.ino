@@ -2,6 +2,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <BluetoothSerial.h>
+#include <map>
 //this needs to be checked for a connection
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
@@ -86,6 +87,8 @@ void setup() {
     Serial.println("Error on discoverAsync f.e. not workin after a \"connect\"");
   }
 }
+
+String sendData = "Hi from esp32!\n";
 
 void loop() {
     if (!SerialBT.isClosed() && SerialBT.connected()) {
