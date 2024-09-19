@@ -33,36 +33,48 @@ void drawcenterlines(void){ //drawing a debug X for offset finding
 }
 
 void drawArrowUp(void){ // Draws an arrow up
-  int ox = 52; //offset X
-  int oy = 20; //offset Y
-  display.fillTriangle(10+ox, 0+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
-  display.fillRect(5+ox, 10+oy, 10, 10, WHITE);
+  int offsetX = 52; //offset X
+  int offsetY = 20; //offset Y
+  display.fillTriangle(10 + offsetX,  0 + offsetY,
+                        0 + offsetX, 10 + offsetY, 
+                       20 + offsetX, 10 + offsetY, WHITE);
+
+  display.fillRect(5+offsetX, 10+offsetY, 10, 10, WHITE);
   //Triangle Size: 10, 0, 0, 10, 20, 10
   //Rectangle Size: 5, 10, 10, 10
 }
 
 void drawArrowDown(void){ //Draws an arrow down
-  int ox = 52; //offset X
-  int oy = 20; //offset Y
-  display.fillTriangle(10+ox, 20+oy, 0+ox, 10+oy, 20+ox, 10+oy, WHITE);
-  display.fillRect(5+ox, 0+oy, 10, 10, WHITE);
+  int offsetX = 52; //offset X
+  int offsetY = 20; //offset Y
+  display.fillTriangle(10 + offsetX, 20 + offsetY, 
+                        0 + offsetX, 10 + offsetY, 
+                       20 + offsetX, 10 + offsetY, WHITE);
+
+  display.fillRect(5+offsetX, 0+offsetY, 10, 10, WHITE);
 } 
 
 void drawArrowLeft(void){
-  int ox = 52; //offset X
-  int oy = 20; //offset Y
-  display.fillTriangle(0+ox, 10+oy, 10+ox, 0+oy, 10+ox, 20+oy, WHITE);
-  display.fillRect(10+ox, 5+oy, 10, 10, WHITE);
+  int offsetX = 52; //offset X
+  int offsetY = 20; //offset Y
+  display.fillTriangle(0 + offsetX, 10 + offsetY, 
+                      10 + offsetX,  0 + offsetY, 
+                      10 + offsetX, 20 + offsetY, WHITE);
+
+  display.fillRect(10 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
 void drawArrowRight(void){
-  int ox = 52; //offset X
-  int oy = 20; //offset Y
-  display.fillTriangle(20+ox, 10+oy, 10+ox, 0+oy, 10+ox, 20+oy, WHITE);
-  display.fillRect(0+ox, 5+oy, 10, 10, WHITE);
+  int offsetX = 52; //offset X
+  int offsetY = 20; //offset Y
+  display.fillTriangle(20 + offsetX, 10 + offsetY, 
+                       10 + offsetX,  0 + offsetY, 
+                       10 + offsetX, 20 + offsetY, WHITE);
+
+  display.fillRect(0 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
-void textDemo(void){
+void textDemo(void){ //showing off Text and Arrows feature via this Demo
   display.setCursor(45,28);
   display.println("Hallo!");
   display.display();
@@ -91,7 +103,7 @@ void textDemo(void){
   display.clearDisplay();
 }
 
-void teleprompter(void){
+void teleprompter(void){ //Code to scroll up the Text on screen
   display.clearDisplay();
   int pos = 80;
   while(pos > -50){
