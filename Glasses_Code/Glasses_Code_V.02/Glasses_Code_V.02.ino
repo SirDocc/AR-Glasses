@@ -15,13 +15,10 @@
 BluetoothSerial SerialBT;
 
 #define BT_DISCOVER_TIME 10000
+esp_spp_sec_t sec_mask = ESP_SPP_SEC_NONE;  // or ESP_SPP_SEC_ENCRYPT|ESP_SPP_SEC_AUTHENTICATE to request pincode confirmation
+esp_spp_role_t role = ESP_SPP_ROLE_SLAVE;   // or ESP_SPP_ROLE_MASTER
 
-static bool btScanAsync = true;
-static bool btScanSync = true;
-
-void btAdvertisedDeviceFound(BTAdvertisedDevice *pDevice) {
-  Serial.printf("Found a device asynchronously: %s\n", pDevice->toString().c_str());
-}
+// std::map<BTAddress, BTAdvertisedDeviceSet> btDeviceList;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -31,8 +28,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  SerialBT.begin("ESP32test");  //Bluetooth device name
-  Serial.println("The device started, now you can pair it with bluetooth!");
 
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("SSD1306 allocation failed"));
@@ -44,32 +39,75 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  if (btScanAsync) {
-    Serial.print("Starting asynchronous discovery... ");
-    if (SerialBT.discoverAsync(btAdvertisedDeviceFound)) {
-      Serial.println("Findings will be reported in \"btAdvertisedDeviceFound\"");
-      delay(10000);
-      Serial.print("Stopping discoverAsync... ");
-      SerialBT.discoverAsyncStop();
-      Serial.println("stopped");
-    } else {
-      Serial.println("Error on discoverAsync f.e. not working after a \"connect\"");
-    }
+  if (!SerialBT.begin("ESP32test", true)) {
+    Serial.println("========== serialBT failed!");
+    abort();
+  }
+  // SerialBT.setPin("1234"); // doesn't seem to change anything
+  // SerialBT.enableSSP(); // doesn't seem to change anything
 
-    if (btScanSync) {
-    Serial.println("Starting synchronous discovery... ");
-    BTScanResults *pResults = SerialBT.discover(BT_DISCOVER_TIME);
-      if (pResults) {
-        pResults->dump(&Serial);
-      } else {
-        Serial.println("Error on BT Scan, no result!");
+  Serial.println("Starting discoverAsync...");
+  BTScanResults *btDeviceList = SerialBT.getScanResults();  // maybe accessing from different threads!
+  if (SerialBT.discoverAsync([](BTAdvertisedDevice *pDevice) {
+        // BTAdvertisedDeviceSet*set = reinterpret_cast<BTAdvertisedDeviceSet*>(pDevice);
+        // btDeviceList[pDevice->getAddress()] = * set;
+        Serial.printf(">>>>>>>>>>>Found a new device asynchronously: %s\n", pDevice->toString().c_str());
+      })) {
+    delay(BT_DISCOVER_TIME);
+    Serial.print("Stopping discoverAsync... ");
+    SerialBT.discoverAsyncStop();
+    Serial.println("discoverAsync stopped");
+    delay(5000);
+    if (btDeviceList->getCount() > 0) {
+      BTAddress addr;
+      int channel = 0;
+      Serial.println("Found devices:");
+      for (int i = 0; i < btDeviceList->getCount(); i++) {
+        BTAdvertisedDevice *device = btDeviceList->getDevice(i);
+        Serial.printf(" ----- %s  %s %d\n", device->getAddress().toString().c_str(), device->getName().c_str(), device->getRSSI());
+        std::map<int, std::string> channels = SerialBT.getChannels(device->getAddress());
+        Serial.printf("scanned for services, found %d\n", channels.size());
+        for (auto const &entry : channels) {
+          Serial.printf("     channel %d (%s)\n", entry.first, entry.second.c_str());
+        }
+        if (channels.size() > 0) {
+          addr = device->getAddress();
+          channel = channels.begin()->first;
+        }
       }
+      if (addr) {
+        Serial.printf("connecting to %s - %d\n", addr.toString().c_str(), channel);
+        SerialBT.connect(addr, channel, sec_mask, role);
+      }
+    } else {
+      Serial.println("Didn't find any devices");
     }
+  } else {
+    Serial.println("Error on discoverAsync f.e. not workin after a \"connect\"");
   }
 }
 
 void loop() {
-  delay(100);
+    if (!SerialBT.isClosed() && SerialBT.connected()) {
+    if (SerialBT.write((const uint8_t *)sendData.c_str(), sendData.length()) != sendData.length()) {
+      Serial.println("tx: error");
+    } else {
+      Serial.printf("tx: %s", sendData.c_str());
+    }
+    if (SerialBT.available()) {
+      Serial.print("rx: ");
+      while (SerialBT.available()) {
+        int c = SerialBT.read();
+        if (c >= 0) {
+          Serial.print((char)c);
+        }
+      }
+      Serial.println();
+    }
+  } else {
+    Serial.println("not connected");
+  }
+  delay(1000);
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
