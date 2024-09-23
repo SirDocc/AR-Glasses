@@ -1,34 +1,26 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <BluetoothSerial.h>
-#include <map>
-//this needs to be checked for a connection
+#include <BLEDevice.h>
+#include <BLEUtils.h>
+#include <BLEServer.h>
+#include <BLE2902.h>
 
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-#endif
-
-#if !defined(CONFIG_BT_SPP_ENABLED)
-#error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
-#endif
-
-BluetoothSerial SerialBT;
-
-#define BT_DISCOVER_TIME 10000
-esp_spp_sec_t sec_mask = ESP_SPP_SEC_NONE;  // or ESP_SPP_SEC_ENCRYPT|ESP_SPP_SEC_AUTHENTICATE to request pincode confirmation
-esp_spp_role_t role = ESP_SPP_ROLE_SLAVE;   // or ESP_SPP_ROLE_MASTER
-
-// std::map<BTAddress, BTAdvertisedDeviceSet> btDeviceList;
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  Serial.println("Starting BLE work!");
 
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("SSD1306 allocation failed"));
@@ -40,77 +32,33 @@ void setup() {
   display.setTextSize(1);
   display.setTextColor(WHITE);
 
-  if (!SerialBT.begin("ESP32test", true)) {
-    Serial.println("========== serialBT failed!");
-    abort();
-  }
-  // SerialBT.setPin("1234"); // doesn't seem to change anything
-  // SerialBT.enableSSP(); // doesn't seem to change anything
+  BLEDevice::init("Arons TestServer owo");
+  pServer = BLEDevice::createServer();
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+  pCharacteristic =
+    pService->createCharacteristic(CHARACTERISTIC_UUID,
+                                   BLECharacteristic::PROPERTY_READ |
+                                   BLECharacteristic::PROPERTY_WRITE);
 
-  Serial.println("Starting discoverAsync...");
-  BTScanResults *btDeviceList = SerialBT.getScanResults();  // maybe accessing from different threads!
-  if (SerialBT.discoverAsync([](BTAdvertisedDevice *pDevice) {
-        // BTAdvertisedDeviceSet*set = reinterpret_cast<BTAdvertisedDeviceSet*>(pDevice);
-        // btDeviceList[pDevice->getAddress()] = * set;
-        Serial.printf(">>>>>>>>>>>Found a new device asynchronously: %s\n", pDevice->toString().c_str());
-      })) {
-    delay(BT_DISCOVER_TIME);
-    Serial.print("Stopping discoverAsync... ");
-    SerialBT.discoverAsyncStop();
-    Serial.println("discoverAsync stopped");
-    delay(5000);
-    if (btDeviceList->getCount() > 0) {
-      BTAddress addr;
-      int channel = 0;
-      Serial.println("Found devices:");
-      for (int i = 0; i < btDeviceList->getCount(); i++) {
-        BTAdvertisedDevice *device = btDeviceList->getDevice(i);
-        Serial.printf(" ----- %s  %s %d\n", device->getAddress().toString().c_str(), device->getName().c_str(), device->getRSSI());
-        std::map<int, std::string> channels = SerialBT.getChannels(device->getAddress());
-        Serial.printf("scanned for services, found %d\n", channels.size());
-        for (auto const &entry : channels) {
-          Serial.printf("     channel %d (%s)\n", entry.first, entry.second.c_str());
-        }
-        if (channels.size() > 0) {
-          addr = device->getAddress();
-          channel = channels.begin()->first;
-        }
-      }
-      if (addr) {
-        Serial.printf("connecting to %s - %d\n", addr.toString().c_str(), channel);
-        SerialBT.connect(addr, channel, sec_mask, role);
-      }
-    } else {
-      Serial.println("Didn't find any devices");
-    }
-  } else {
-    Serial.println("Error on discoverAsync f.e. not workin after a \"connect\"");
-  }
+  pCharacteristic->setValue("Hello World says Aron");
+  pService->start();
+  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+  Serial.println("Characteristic defined! Now you can read it in your phone!");
+
+  
 }
 
-String sendData = "Hi from esp32!\n";
-
 void loop() {
-    if (!SerialBT.isClosed() && SerialBT.connected()) {
-    if (SerialBT.write((const uint8_t *)sendData.c_str(), sendData.length()) != sendData.length()) {
-      Serial.println("tx: error");
-    } else {
-      Serial.printf("tx: %s", sendData.c_str());
-    }
-    if (SerialBT.available()) {
-      Serial.print("rx: ");
-      while (SerialBT.available()) {
-        int c = SerialBT.read();
-        if (c >= 0) {
-          Serial.print((char)c);
-        }
-      }
-      Serial.println();
-    }
-  } else {
-    Serial.println("not connected");
-  }
-  delay(1000);
+  Serial.println("Now starting the Demo!");
+  pCharacteristic->setValue("Please Write: go");
+    textDemo();
+
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
