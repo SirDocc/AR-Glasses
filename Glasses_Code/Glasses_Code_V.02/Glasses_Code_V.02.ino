@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <math.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <BLEDevice.h>
@@ -8,6 +9,8 @@
 
 BLEServer *pServer = NULL;
 BLECharacteristic *pCharacteristic = NULL;
+BLEDescriptor *pDescr;
+BLE2902 *pBLE2902_1;
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -16,6 +19,79 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+
+void writemytext (String com){
+  display.clearDisplay();
+  display.display();
+  display.setCursor(0,28);
+  display.println(com);
+  display.display();
+}
+
+void scrollpls (int time){
+  display.startscrollleft(0x00, 0x0F);
+  delay(time);
+  display.stopscroll();
+}
+
+  void scrollmytext(String com){
+
+    display.clearDisplay();
+    display.display();
+    display.setCursor(0,28);
+    int stringAmount = com.length() % 20;
+    Serial.println("COMAMOUNT: " + com.length());
+    Serial.println("STRINGAMOUNT: " + stringAmount);
+    stringAmount = floor(stringAmount);
+    Serial.println("STRINGAMOUNT: " + stringAmount);
+
+    switch(stringAmount){
+      case 1:
+        String line1 = com.substring(0,20);
+        Serial.println("Line1: " + line1);
+        String line2 = com.substring(21,com.length());
+        Serial.println("Line2: " + line2);
+        writemytext(line1);
+        scrollpls(8000);
+        writemytext(line2);
+        scrollpls(8000);
+      break;
+    }
+  }
+
+void onwritelogic(){
+  Serial.begin(115200);
+  String command = pCharacteristic->getValue();
+  if (command == "demo"){
+    pCharacteristic->setValue("Displaying Demo");
+    writemytext("Displaying Demo");
+    delay(2000);
+    textDemo();
+    delay(2000);
+    pCharacteristic->setValue("Waiting for command");
+    writemytext("Waiting for command");
+  }
+  else if (command == "comoot"){
+    pCharacteristic->setValue("Work in Progress");
+    writemytext("Work in Progress");
+  }
+  else if (command.length() > 21){
+    scrollmytext(command);
+  }
+  else {
+    writemytext(command);
+  }
+}
+
+class CharacteristicCallBack: public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pChar) override {
+    String pChar2_value_stdstr = pChar -> getValue();
+    String pChar2_value_string = String(pChar2_value_stdstr.c_str());
+    Serial.println(pChar2_value_string);
+    onwritelogic();
+  }
+};
 
 void setup() {
   // put your setup code here, to run once:
@@ -38,9 +114,23 @@ void setup() {
   pCharacteristic =
     pService->createCharacteristic(CHARACTERISTIC_UUID,
                                    BLECharacteristic::PROPERTY_READ |
-                                   BLECharacteristic::PROPERTY_WRITE);
+                                   BLECharacteristic::PROPERTY_WRITE
+                                   );
+  
+pCharacteristic->setValue("waiting for command");
+  
+  //Descriptor time
+  pDescr = new BLEDescriptor((uint16_t)0x2901);
+  pDescr->setValue("Console");
+  pCharacteristic->addDescriptor(pDescr);
 
-  pCharacteristic->setValue("Hello World says Aron");
+  pBLE2902_1 = new BLE2902();
+  pBLE2902_1->setNotifications(true);                 
+  pCharacteristic->addDescriptor(pBLE2902_1);
+
+  //time for the callback Function
+  pCharacteristic->setCallbacks(new CharacteristicCallBack());
+
   pService->start();
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
@@ -50,15 +140,12 @@ void setup() {
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
   Serial.println("Characteristic defined! Now you can read it in your phone!");
-
-  
 }
 
+//pCharacteristics is for user input / user info
+//pCharacteristics_1 is for the Data on the Display
 void loop() {
-  Serial.println("Now starting the Demo!");
-  pCharacteristic->setValue("Please Write: go");
-    textDemo();
-
+  
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
@@ -109,6 +196,8 @@ void drawArrowRight(void){
 }
 
 void textDemo(void){ //showing off Text and Arrows feature via this Demo
+  display.clearDisplay();
+  display.display();
   display.setCursor(45,28);
   display.println("Hallo!");
   display.display();
