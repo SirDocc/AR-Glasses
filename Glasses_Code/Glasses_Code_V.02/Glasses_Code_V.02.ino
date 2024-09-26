@@ -1,3 +1,9 @@
+/*
+Author: Aron Stelter
+Datum:  26.09.2024 
+Version:2.0
+*/
+
 #include <Wire.h>
 #include <math.h>
 #include <Adafruit_GFX.h>
@@ -17,10 +23,11 @@ BLE2902 *pBLE2902_1; //global definierter pointer für BLE2902_1
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); //initialisierung des Displays
 
-#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b" 
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-void  WriteMyText (String command){ //diese Methode schreibt den Parameter auf den screen.
+
+void writemytext (String command){
   display.clearDisplay();
   display.display();
   display.setCursor(0,28);
@@ -34,7 +41,7 @@ void scrollPls (int time){ //diese Methode scrollt den Text auf dem Screen für 
   display.stopscroll();
 }
 
-void fitMyText(String command){ //diese Methode teilt den String des Nutzers in kleinere Substrings, sonst passt der Text nicht auf den Screen
+  void fitMyText(String command){ //diese Methode teilt den String des Nutzers in kleinere Substrings, sonst passt der Text nicht auf den Screen
   Serial.println("This is my String: " + command);
   display.clearDisplay();
   display.display();
@@ -59,39 +66,44 @@ void fitMyText(String command){ //diese Methode teilt den String des Nutzers in 
 }
 
 void onWriteLogic(String command){ //Dieser Code wird ausgeführt wenn der Nutzer etwas an den Server schreibt. Hier wird unterschieden ob es ein Kommando ist und ob gescrollt werden soll.
+  Serial.begin(115200);
+  String command = pCharacteristic->getValue();
   if (command == "demo"){
-    WriteMyText("Displaying Demo");
+    pCharacteristic->setValue("Displaying Demo");
+    writemytext("Displaying Demo");
     delay(2000);
     textDemo();
     delay(2000);
-    WriteMyText("Waiting for command");
+    pCharacteristic->setValue("Waiting for command");
+    writemytext("Waiting for command");
   }
-  else if (command == "komoot"){
-    WriteMyText("Work in Progress");
+  else if (command == "commandoot"){
+    pCharacteristic->setValue("Work in Progress");
+    writemytext("Work in Progress");
   }
   else if (command.length() > 21){
-    pCharacteristic->setValue("Writing Text");
-    fitMyText(command);
+    scrollmytext(command);
   }
   else {
-    WriteMyText(command);
+    writemytext(command);
   }
 }
 
-class CharacteristicCallBack: public BLECharacteristicCallbacks { //Diese Funktion überschreibt das Verhalten des Servers.
-  void onWrite(BLECharacteristic *pChar) override { //Statt ständigem aussenden der Info, führt der Server nur Code aus wenn er vom Nutzer Info bekommt
+class CharacteristicCallBack: public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pChar) override {
     String pChar2_value_stdstr = pChar -> getValue();
     String pChar2_value_string = String(pChar2_value_stdstr.c_str());
     Serial.println(pChar2_value_string);
-    onWriteLogic(pChar2_value_string);
+    onwritelogic();
   }
 };
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(115200); 
+  Serial.begin(115200);
   Serial.println("Starting BLE work!");
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { //failsafe für den Display
+
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;);
   }
@@ -100,9 +112,8 @@ void setup() {
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.display(); //setup für den Display
 
-  BLEDevice::init("Benchie Brille"); //Hier passiert das ganze Setup für die BLE Technik
+  BLEDevice::init("Arons TestServer owo");
   pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   pCharacteristic =
@@ -111,8 +122,10 @@ void setup() {
                                    BLECharacteristic::PROPERTY_WRITE
                                    );
   
+pCharacteristic->setValue("waiting for command");
+  
   //Descriptor time
-  pDescr = new BLEDescriptor((uint16_t)0x2901); //Hier wird eine Description hinzugefügt
+  pDescr = new BLEDescriptor((uint16_t)0x2901);
   pDescr->setValue("Console");
   pCharacteristic->addDescriptor(pDescr);
 
@@ -121,11 +134,11 @@ void setup() {
   pCharacteristic->addDescriptor(pBLE2902_1);
 
   //time for the callback Function
-  pCharacteristic->setCallbacks(new CharacteristicCallBack()); //Hier wird die Callback function hinzugefügt
+  pCharacteristic->setCallbacks(new CharacteristicCallBack());
 
   pService->start();
-  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
-  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising(); //Mit diesem Code wird die Brille gefunden
+  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward commandpatibility
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
@@ -137,6 +150,7 @@ void setup() {
 //pCharacteristics is for user input / user info
 //pCharacteristics_1 is for the Data on the Display
 void loop() {
+  
 }
 
 void drawcenterlines(void){ //drawing a debug X for offset finding
@@ -144,7 +158,7 @@ void drawcenterlines(void){ //drawing a debug X for offset finding
   display.drawLine(127, 0, 0, 63, WHITE);
 }
 
-void drawArrowUp(void){ // Hier wird ein Pfeil nach oben gemalt
+void drawArrowUp(void){ // Draws an arrow up
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(10 + offsetX,  0 + offsetY,
@@ -156,7 +170,7 @@ void drawArrowUp(void){ // Hier wird ein Pfeil nach oben gemalt
   //Rectangle Size: 5, 10, 10, 10
 }
 
-void drawArrowDown(void){ // Hier wird ein Pfeil nach unten gemalt
+void drawArrowDown(void){ //Draws an arrow down
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(10 + offsetX, 20 + offsetY, 
@@ -166,7 +180,7 @@ void drawArrowDown(void){ // Hier wird ein Pfeil nach unten gemalt
   display.fillRect(5+offsetX, 0+offsetY, 10, 10, WHITE);
 } 
 
-void drawArrowLeft(void){ // Hier wird ein Pfeil nach links gemalt
+void drawArrowLeft(void){
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(0 + offsetX, 10 + offsetY, 
@@ -176,7 +190,7 @@ void drawArrowLeft(void){ // Hier wird ein Pfeil nach links gemalt
   display.fillRect(10 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
-void drawArrowRight(void){ // Hier wird ein Pfeil nach rechts gemalt
+void drawArrowRight(void){
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(20 + offsetX, 10 + offsetY, 
@@ -186,7 +200,7 @@ void drawArrowRight(void){ // Hier wird ein Pfeil nach rechts gemalt
   display.fillRect(0 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
-void textDemo(void){ //Das ist die Demo welche man mit "demo" in der Konsole ausführen kann
+void textDemo(void){ //showing off Text and Arrows feature via this Demo
   display.clearDisplay();
   display.display();
   display.setCursor(45,28);
@@ -215,4 +229,20 @@ void textDemo(void){ //Das ist die Demo welche man mit "demo" in der Konsole aus
   display.display();
   delay(1000);
   display.clearDisplay();
+}
+
+void teleprompter(void){ //Code to scroll up the Text on screen
+  display.clearDisplay();
+  int pos = 80;
+  while(pos > -50){
+    display.setCursor(0, pos);
+    display.println("BEEMOVIE SCRIPT HELP MEEE");
+    display.display();
+    delay(100);
+    pos = pos - 1;
+    display.clearDisplay();
+    display.setCursor(0, pos);
+    display.println("BEEMOVIE SCRIPT HELP MEEE");
+    display.display();
+  }
 }
