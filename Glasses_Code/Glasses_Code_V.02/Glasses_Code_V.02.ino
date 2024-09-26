@@ -26,7 +26,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); //initialisier
 #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 
-void  WriteMyText (String command){ //diese Methode schreibt den Parameter auf den screen.
+void  writeMyText (String command){ //diese Methode schreibt den Parameter auf den screen.
   display.clearDisplay();
   display.display();
   display.setCursor(0,28);
@@ -49,14 +49,14 @@ void fitMyText(String command){ //diese Methode teilt den String des Nutzers in 
   for (int i = 0; i <= command.length(); i+=20){
     if(i+19 <= command.length()){
       onDisplay = command.substring(i,i+20);
-      WriteMyText(onDisplay);
+      writeMyText(onDisplay);
       Serial.println("This is on Display rn: " + onDisplay);
       delay(1000);
       scrollPls(8000);
     }
     else {
       onDisplay = command.substring(i,command.length());
-      WriteMyText(onDisplay);
+      writeMyText(onDisplay);
       Serial.println("This is on final Display rn: " + onDisplay);
       delay(1000);
       scrollPls(8000);
@@ -68,24 +68,24 @@ void onWriteLogic(String command){ //Dieser Code wird ausgeführt wenn der Nutze
   Serial.begin(115200);
   if (command == "demo"){
     pCharacteristic->setValue("Displaying Demo");
-    WriteMyText("Displaying Demo");
+    writeMyText("Displaying Demo");
     delay(2000);
     textDemo();
     delay(2000);
     pCharacteristic->setValue("Waiting for command");
-    WriteMyText("Waiting for command");
+    writeMyText("Waiting for command");
   }
   else if (command == "komoot"){
-    WriteMyText("Work in Progress");
+    writeMyText("Work in Progress");
     delay(2000);
-    WriteMyText("Waiting for command");
+    writeMyText("Waiting for command");
   }
   else if (command.length() > 21){
     pCharacteristic->setValue("Writing Text");
     fitMyText(command);
   }
   else {
-    WriteMyText(command);
+    writeMyText(command);
   }
 }
 
