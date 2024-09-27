@@ -29,7 +29,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); //initialisier
 void  writeMyText (String command){ //diese Methode schreibt den Parameter auf den screen.
   display.clearDisplay();
   display.display();
-  display.setCursor(0,28);
+  display.setCursor(35,20);
   display.println(command);
   display.display();
 }
@@ -44,48 +44,51 @@ void fitMyText(String command){ //diese Methode teilt den String des Nutzers in 
   Serial.println("This is my String: " + command);
   display.clearDisplay();
   display.display();
-  display.setCursor(0,28);
+  display.setCursor(35,20);
   String onDisplay;
-  for (int i = 0; i <= command.length(); i+=20){
-    if(i+19 <= command.length()){
-      onDisplay = command.substring(i,i+20);
+  for (int i = 0; i <= command.length(); i+=10){
+    if(i+10 <= command.length()){
+      onDisplay = command.substring(i,i+10);
       writeMyText(onDisplay);
       Serial.println("This is on Display rn: " + onDisplay);
       delay(1000);
-      scrollPls(8000);
+      scrollPls(4000);
     }
     else {
       onDisplay = command.substring(i,command.length());
       writeMyText(onDisplay);
       Serial.println("This is on final Display rn: " + onDisplay);
       delay(1000);
-      scrollPls(8000);
+      scrollPls(4000);
     }
   }
 }
 
 void onWriteLogic(String command){ //Dieser Code wird ausgeführt wenn der Nutzer etwas an den Server schreibt. Hier wird unterschieden ob es ein Kommando ist und ob gescrollt werden soll.
-  Serial.begin(115200);
-  if (command == "demo"){
-    pCharacteristic->setValue("Displaying Demo");
+
+  if (command == "demo"){ //Spielt eine kleine Demo ab
     writeMyText("Displaying Demo");
     delay(2000);
     textDemo();
     delay(2000);
-    pCharacteristic->setValue("Waiting for command");
     writeMyText("Waiting for command");
   }
-  else if (command == "komoot"){
+  else if (command == "komoot"){ //Ein Platzhalter für unsere Komoot app Kompatibilität
     writeMyText("Work in Progress");
     delay(2000);
     writeMyText("Waiting for command");
   }
-  else if (command.length() > 21){
-    pCharacteristic->setValue("Writing Text");
+  else if (command == "drawX"){ //Malt ein X auf den Bildschirm für das Zentrieren von Text und Optik
+    display.clearDisplay();
+    display.display();
+    drawCenterLines();
+    display.display();
+  }
+  else if (command.length() > 10){ //Falls ein Text >10 Zeichen hat soll dieser gescrollt werden
     fitMyText(command);
   }
   else {
-    writeMyText(command);
+    writeMyText(command); //Falls ein Text <10 Zeichen hat soll er statisch angezeigt werden
   }
 }
 
@@ -122,8 +125,8 @@ void setup() {
                                    BLECharacteristic::PROPERTY_READ |
                                    BLECharacteristic::PROPERTY_WRITE
                                    );
-  
-pCharacteristic->setValue("waiting for command");
+
+  pCharacteristic->setValue("Waiting for command");
   
   //Descriptor time
   pDescr = new BLEDescriptor((uint16_t)0x2901); //Hier wird eine Description hinzugefügt
@@ -154,12 +157,12 @@ void loop() {
   
 }
 
-void drawcenterlines(void){ //drawing a debug X for offset finding
+void drawCenterLines(){ //drawing a debug X for offset finding
   display.drawLine(0, 0, 127, 63, WHITE);
   display.drawLine(127, 0, 0, 63, WHITE);
 }
 
-void drawArrowUp(void){ // Hier wird ein Pfeil nach oben gemalt
+void drawArrowUp(){ // Hier wird ein Pfeil nach oben gemalt
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(10 + offsetX,  0 + offsetY,
@@ -171,7 +174,7 @@ void drawArrowUp(void){ // Hier wird ein Pfeil nach oben gemalt
   //Rectangle Size: 5, 10, 10, 10
 }
 
-void drawArrowDown(void){ // Hier wird ein Pfeil nach unten gemalt
+void drawArrowDown(){ // Hier wird ein Pfeil nach unten gemalt
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(10 + offsetX, 20 + offsetY, 
@@ -181,7 +184,7 @@ void drawArrowDown(void){ // Hier wird ein Pfeil nach unten gemalt
   display.fillRect(5+offsetX, 0+offsetY, 10, 10, WHITE);
 } 
 
-void drawArrowLeft(void){ // Hier wird ein Pfeil nach links gemalt
+void drawArrowLeft(){ // Hier wird ein Pfeil nach links gemalt
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(0 + offsetX, 10 + offsetY, 
@@ -191,7 +194,7 @@ void drawArrowLeft(void){ // Hier wird ein Pfeil nach links gemalt
   display.fillRect(10 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
-void drawArrowRight(void){ // Hier wird ein Pfeil nach rechts gemalt
+void drawArrowRight(){ // Hier wird ein Pfeil nach rechts gemalt
   int offsetX = 52; //offset X
   int offsetY = 20; //offset Y
   display.fillTriangle(20 + offsetX, 10 + offsetY, 
@@ -201,15 +204,15 @@ void drawArrowRight(void){ // Hier wird ein Pfeil nach rechts gemalt
   display.fillRect(0 + offsetX, 5 + offsetY, 10, 10, WHITE);
 }
 
-void textDemo(void){ //Das ist die Demo welche man mit "demo" in der Konsole ausführen kann
+void textDemo(){ //Das ist die Demo welche man mit "demo" in der Konsole ausführen kann
   display.clearDisplay();
   display.display();
-  display.setCursor(45,28);
+  display.setCursor(35,20);
   display.println("Hallo!");
   display.display();
   delay(1000);
   display.clearDisplay();
-  display.setCursor(45,28);
+  display.setCursor(35,20);
   display.println("Banane");
   display.display();
   delay(1000);
